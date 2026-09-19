@@ -1,11 +1,9 @@
-type Stance = "ready" | "unready" | "spectating" | "playing";
-
 type Player = {
 	id: string;
 	username: string;
 	points: number;
 	wins: number;
-	stance: Stance;
+	playing: boolean;
 };
 
 type Message = {

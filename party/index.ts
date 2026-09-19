@@ -4,6 +4,7 @@ import { updateUser } from "./users/update";
 const events: { [key: string]: SHandler } = { updateUser }
 
 export default class MahjongRoom implements Party.Server {
+	inGame: boolean = false;
 	players: { [key: string]: Player} = {};
 	
 	constructor(readonly room: Party.Room) { }
@@ -19,7 +20,7 @@ export default class MahjongRoom implements Party.Server {
 			username: "anonymous",
 			wins: 0,
 			points: 0,
-			stance: "unready"
+			playing: false
 		};
 		
 		conn.send(JSON.stringify({ event: "uuid", payload: conn.id }));

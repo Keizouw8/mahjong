@@ -1,17 +1,17 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { page } from "$app/state";
 	import PartySocket from "partysocket";
     import { onMount } from "svelte";
-	
-	let { params } = $props();
+    
 	let socket: PartySocket;
-	let roomid = $derived(params.id);
+	let roomid = $derived(page.params.id);
 	let uuid = $state("");
-	let players: Player[] = $state([]);
+	let players: { [key: string]: Player } = $state({});
 
 	let events: { [key: string]: Function } = {
 		uuid(id: string){ uuid = id; },
-		players(p: Player[]){ players = p; }
+		players(p: { [key: string]: Player }){ players = p; }
 	};
 
 	onMount(function(){
@@ -26,17 +26,33 @@
 			events[event]?.(payload);
 		}
 		
-		console.log(socket);
-		
-		return socket.close;
+		return () => socket.close();
 	});
+
+	function send(event: string, payload: any){
+		socket.send(JSON.stringify({ event, payload }));
+	}
 </script>
-<h1>room: {params.id}</h1>
+<a href="/">home</a>
+<h1>room: {roomid}</h1>
 <h2>players</h2>
-{#each players as player}
-	<b>{player.username} {#if player.id == uuid}(you){/if}</b>
+{#each Object.values(players) as player}
+	{#if player.id == uuid}
+		<b>
+			<span onblur={_ => send("updateUser", { username: player.username.replaceAll(/\s/g,'') })} bind:innerText={player.username} contenteditable></span>
+			(you)
+		</b>
+	{:else}
+		<b>{player.username}</b>
+	{/if}
 	<ul>
-		<li>Stance: {player.stance}</li>
+		<li>Stance:
+			{#if player.id == uuid}	
+				<button onclick={_ => send("updateUser", { playing: !player.playing })}>{ ["spectate", "play"][+player.playing] }</button>
+			{:else}
+				{ ["spectate", "play"][+player.playing] }
+			{/if}
+		</li>
 		<li>Wins: {player.wins}</li>
 		<li>Points: {player.points}</li>
 	</ul>

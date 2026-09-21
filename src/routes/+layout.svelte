@@ -6,6 +6,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>mahjong</title>
 </svelte:head>
 
 {@render children()}

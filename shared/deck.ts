@@ -41,7 +41,7 @@ export default class Deck {
 		return new Deck(source.tiles.map(Tile.fromId));
 	}
 
-	static fullDeck(flowers: boolean = false): Deck {
+	static fullDeck(noFlowers: boolean = false): Deck {
 		let tiles: Tile[] = [];
 			
 		for (let suit of Object.keys(suits) as Suit[]){
@@ -49,7 +49,7 @@ export default class Deck {
 			tiles.push(...Array.from({ length: suits[suit] }, (_, i) => Array.from({ length: 4 }, (_, o) => new Tile(suit, i, o))).flat());
 		}
 		
-		if (flowers) tiles.push(...Array.from({ length: suits[Suit.Flower] }, (_, i) => new Tile(Suit.Flower, i, 1)));
+		if (!noFlowers) tiles.push(...Array.from({ length: suits[Suit.Flower] }, (_, i) => new Tile(Suit.Flower, i, 1)));
 		
 		return new Deck(tiles);
 	}

@@ -108,15 +108,16 @@
 		<ul>
 			<li>Points: {user.points}
     			{#if user.id == uuid}
-    				<button onclick={_ => send("add", parseFloat(prompt("How much: ") || "0") || 0)}>add</button>
+    				<button onclick={_ => send("add", parseFloat(prompt("How many: ") || "0") || 0)}>add</button>
     			{:else}
-    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How much: ") || "0") || 0 })}>pay</button>
+    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How many: ") || "0") || 0 })}>pay</button>
     			{/if}
 			</li>
 			{#if game && user.playing}
 				<li>Open:
 					{#if user.id == uuid && open}
-						<div>
+						{#if open.length}
+							<div>
 							{#each open as tile, i (tile.id)}
 								<span
 									draggable="true"
@@ -127,11 +128,12 @@
 									onkeydown={() => {}}
 									role="button"
 									tabindex="0"
-									style="font-size: 75px;">{tile.render()}</span>
-							{:else}
-								<span>empty</span>
+									style="font-size: 75px;">{tile.render()}</span>								
 							{/each}
 						</div>
+						{:else}
+							<span>empty</span>
+						{/if}
 					{:else}
 						{#each game.players[user.id].open.tiles as tile (tile.id)}
 							<span style="font-size: 50px;">{tile.render()}</span>

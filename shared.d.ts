@@ -2,7 +2,6 @@ type User = {
 	id: string;
 	username: string;
 	points: number;
-	wins: number;
 	playing: boolean;
 };
 

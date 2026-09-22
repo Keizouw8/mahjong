@@ -9,8 +9,10 @@ import { discardTile } from "./game/discardTile";
 import { openTile } from "./game/openTile";
 import { sortOpen } from "./game/sortOpen";
 import { closeTile } from "./game/closeTile";
+import { add } from "./users/add";
+import { pay } from "./users/pay";
 
-const events: { [key: string]: SHandler } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile }
+const events: { [key: string]: SHandler } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile, add, pay };
 
 export default class MahjongRoom implements Party.Server {
 	game: Game | false = false;
@@ -27,7 +29,6 @@ export default class MahjongRoom implements Party.Server {
 		this.users[conn.id] = {
 			id: conn.id,
 			username: "anonymous",
-			wins: 0,
 			points: 0,
 			playing: false
 		};

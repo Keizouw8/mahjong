@@ -99,15 +99,20 @@
 	<div style="color: {user.playing ? "unset" : "gray"}">
 		{#if user.id == uuid}
 			<b>
-				<span onblur={_ => send("updateUser", { username: user.username.replaceAll(/\s/g,'') })} bind:innerText={user.username} contenteditable></span>
+				<span onblur={_ => send("updateUser", { username: user.username.replaceAll(/\s/g, "") })} bind:innerText={user.username} contenteditable></span>
 				(you)
 			</b>
 		{:else}
 			<b>{user.username}</b>
 		{/if}
 		<ul>
-			<li>Wins: {user.wins}</li>
-			<li>Points: {user.points}</li>
+			<li>Points: {user.points}
+    			{#if user.id == uuid}
+    				<button onclick={_ => send("add", parseFloat(prompt("How much: ") || "0") || 0)}>add</button>
+    			{:else}
+    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How much: ") || "0") || 0 })}>pay</button>
+    			{/if}
+			</li>
 			{#if game && user.playing}
 				<li>Open:
 					{#if user.id == uuid && open}

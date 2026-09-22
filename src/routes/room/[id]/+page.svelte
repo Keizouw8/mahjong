@@ -74,6 +74,7 @@
 <h1>room: {roomid}</h1>
 <h2>game</h2>
 {#if game}
+	<button onclick={() => send("endGame")}>end game</button>
 	<h4>Deck <button onclick={() => send("drawTile")}>draw</button></h4>
 	<span>{game.deck.size()} tiles</span>
 	<h4>Current tile <button disabled={!game.current} onclick={() => send("drawTile", true)}>draw</button></h4>

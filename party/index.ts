@@ -11,8 +11,9 @@ import sortOpen from "./game/sortOpen";
 import closeTile from "./game/closeTile";
 import add from "./users/add";
 import pay from "./users/pay";
+import endGame from "./game/endGame";
 
-const events: { [key: string]: Function } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile, add, pay };
+const events: { [key: string]: Function } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile, add, pay, endGame };
 
 export class MahjongRoom extends Server {
 	game: Game | false = false;

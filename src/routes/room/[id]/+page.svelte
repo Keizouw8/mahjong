@@ -109,9 +109,9 @@
 		<ul>
 			<li>Points: {user.points}
     			{#if user.id == uuid}
-    				<button onclick={_ => send("add", parseFloat(prompt("How many: ") || "0") || 0)}>add</button>
+    				<button onclick={_ => send("add", parseFloat(prompt("How many points?") || "0") || 0)}>add</button>
     			{:else}
-    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How many: ") || "0") || 0 })}>pay</button>
+    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How many points?") || "0") || 0 })}>pay</button>
     			{/if}
 			</li>
 			{#if game && user.playing}

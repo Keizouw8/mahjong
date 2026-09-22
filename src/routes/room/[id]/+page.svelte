@@ -52,7 +52,7 @@
 
 	onMount(function(){
 		socket = new PartySocket({
-			host: `${window.location.hostname}:${import.meta.env.DEV ? 1999 : window.location.port}`,
+			host: import.meta.env.DEV ? `${window.location.hostname}:1999` : window.location.host,
 			room: roomid
 		});
 

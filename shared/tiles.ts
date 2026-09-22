@@ -37,7 +37,7 @@ export default class Tile {
 
 	static fromId(id: string): Tile {
 		let [suit, value, copy] = id.split("-");
-		if (!(suit in Suit)) throw new Error("Provided invalid suit");
+		if (!Object.values(Suit).includes(suit as Suit)) throw new Error("Provided invalid suit");
 		return new Tile(suit as Suit, +value, +copy);
 	}
 
@@ -45,17 +45,4 @@ export default class Tile {
 		if (this.value > suits[this.suit]) throw new Error("Invalid value within suit");
 		return characters[this.suit][this.value];
 	}
-}
-
-export function generateDeck(flowers: boolean = false): Tile[] {
-	let deck: Tile[] = [];
-	
-	for (let suit of Object.keys(suits) as Suit[]){
-		if (suit == Suit.Flower) continue;
-		deck.push(...Array.from({ length: suits[suit] }, (_, i) => Array.from({ length: 4 }, (_, o) => new Tile(suit, i, o))).flat());
-	}
-	
-	if (flowers) deck.push(...Array.from({ length: suits[Suit.Flower] }, (_, i) => new Tile(Suit.Flower, i, 1)));
-	
-	return deck;
 }

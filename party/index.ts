@@ -1,12 +1,16 @@
 import type * as Party from "partykit/server";
 import Game from "../shared/game";
-import { updateUser } from "./users/update";
-import { startGame } from "./game/start";
-import { drawTile } from "./game/draw";
-import { sortHand } from "./game/sort";
-import { discardTile } from "./game/discard";
 
-const events: { [key: string]: SHandler } = { updateUser, startGame, drawTile, sortHand, discardTile }
+import { updateUser } from "./users/updateUser";
+import { startGame } from "./game/startGame";
+import { drawTile } from "./game/drawTile";
+import { sortHand } from "./game/sortHand";
+import { discardTile } from "./game/discardTile";
+import { openTile } from "./game/openTile";
+import { sortOpen } from "./game/sortOpen";
+import { closeTile } from "./game/closeTile";
+
+const events: { [key: string]: SHandler } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile }
 
 export default class MahjongRoom implements Party.Server {
 	game: Game | false = false;

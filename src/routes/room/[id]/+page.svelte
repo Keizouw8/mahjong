@@ -15,13 +15,14 @@
 	let users: { [key: string]: User } = $state({});
 	let game: Game | false = $state(false);
 	let hand: Tile[] = $state([]);
+	let open: Tile[] = $state([]);
 
 	let sortedPlayers = $derived(Object.values(users).sort((a, b) => +b.playing - +a.playing));
 	let startable = $derived(!Object.values(users).filter(user => user.playing).length);
 
 	let draggedIndex: number | undefined;
 	
-	function drop(targetIndex: number){
+	function dropHand(targetIndex: number){
 		if(draggedIndex === undefined || !hand) return;
 		const [draggedTile] = hand.splice(draggedIndex, 1);
 		hand.splice(targetIndex, 0, draggedTile);
@@ -29,12 +30,23 @@
 		send("sortHand", { tiles: hand.map(tile => tile.id) });
 	}
 
+	function dropOpen(targetIndex: number){
+		if(draggedIndex === undefined || !open) return;
+		const [draggedTile] = open.splice(draggedIndex, 1);
+		open.splice(targetIndex, 0, draggedTile);
+		draggedIndex = undefined;
+		send("sortOpen", { tiles: open.map(tile => tile.id) });
+	}
+
 	let events: { [key: string]: Function } = {
 		uuid(id: string){ uuid = id; },
 		users(p: { [key: string]: User }){ users = p; },
 		game(g: SGame | false){
 			game = g && Game.import(g);
-			if(game && game.players[uuid]) hand = game.players[uuid].hand.tiles;
+			if(game && game.players[uuid]){
+				hand = game.players[uuid].hand.tiles;
+				open = game.players[uuid].open.tiles;
+			}
 		}
 	};
 
@@ -97,21 +109,49 @@
 			<li>Wins: {user.wins}</li>
 			<li>Points: {user.points}</li>
 			{#if game && user.playing}
+				<li>Open:
+					{#if user.id == uuid && open}
+						<div>
+							{#each open as tile, i (tile.id)}
+								<span
+									draggable="true"
+									ondragstart={_ => draggedIndex = i}
+									ondragover={e => e.preventDefault()}
+									ondrop={_ => dropOpen(i)}
+									onclick={() => send("closeTile", tile.id)}
+									onkeydown={() => {}}
+									role="button"
+									tabindex="0"
+									style="font-size: 75px;">{tile.render()}</span>
+							{:else}
+								<span>empty</span>
+							{/each}
+						</div>
+					{:else}
+						{#each game.players[user.id].open.tiles as tile (tile.id)}
+							<span style="font-size: 50px;">{tile.render()}</span>
+						{:else}
+							<span>empty</span>
+						{/each}
+					{/if}
+				</li>
 				<li>Hand:
 					{#if user.id == uuid && hand}
 						<div>
 							{#each hand as tile, i (tile.id)}
 								<span
-									role="button"
-									tabindex="0"
 									draggable="true"
 									ondragstart={_ => draggedIndex = i}
 									ondragover={e => e.preventDefault()}
-									ondrop={_ => drop(i)}
+									ondrop={_ => dropHand(i)}
+									onclick={() => send("openTile", tile.id)}
 									oncontextmenu={e => {
 										e.preventDefault();
 										send("discardTile", tile.id);
 									}}
+									onkeydown={() => {}}
+									role="button"
+									tabindex="0"
 									style="font-size: 75px;">{tile.render()}</span>
 							{:else}
 								<span>empty??</span>

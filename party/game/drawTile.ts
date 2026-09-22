@@ -1,7 +1,7 @@
-import MahjongRoom from "..";
-import type * as Party from "partykit/server";
+import type { MahjongRoom } from "..";
+import type { Connection } from "partyserver";
 
-export const drawTile: SHandler = (room: MahjongRoom, sender: Party.Connection, fromCurrent: boolean = false) => {
+export default function drawTile (room: MahjongRoom, sender: Connection, fromCurrent: boolean = false) {
 	if (!room.game) return;
 	let player = room.game.players[sender.id];
 	if (!player) return;

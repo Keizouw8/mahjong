@@ -9,5 +9,3 @@ type Message = {
 	event: string;
 	payload: any;
 };
-
-type SHandler = (room: MahjongRoom, sender: Party.Connection, payload: any) => any;

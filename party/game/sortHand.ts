@@ -1,8 +1,8 @@
-import MahjongRoom from "..";
-import type * as Party from "partykit/server";
+import type { MahjongRoom } from "..";
+import type { Connection } from "partyserver";
 import Deck, { type SDeck } from "../../shared/deck";
 
-export const sortHand: SHandler = (room: MahjongRoom, sender: Party.Connection, hand: SDeck) => {
+export default function sortHand (room: MahjongRoom, sender: Connection, hand: SDeck) {
 	if (!room.game) return;
 	let player = room.game.players[sender.id];
 	if (!player) return;

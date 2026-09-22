@@ -1,7 +1,7 @@
-import type MahjongRoom from "..";
-import type * as Party from "partykit/server";
+import type { MahjongRoom } from "..";
+import type { Connection } from "partyserver";
 
-export const pay: SHandler = (room: MahjongRoom, sender: Party.Connection, { recipient, amount }: { recipient: string, amount: number }) => {
+export default function pay (room: MahjongRoom, sender: Connection, { recipient, amount }: { recipient: string, amount: number }) {
     room.users[sender.id].points -= amount;
     room.users[recipient].points += amount;
 	room.sendUsers();

@@ -1,62 +1,63 @@
-import type * as Party from "partykit/server";
+import { Server, routePartykitRequest, type Connection, type ConnectionContext, type WSMessage } from "partyserver";
 import Game from "../shared/game";
 
-import { updateUser } from "./users/updateUser";
-import { startGame } from "./game/startGame";
-import { drawTile } from "./game/drawTile";
-import { sortHand } from "./game/sortHand";
-import { discardTile } from "./game/discardTile";
-import { openTile } from "./game/openTile";
-import { sortOpen } from "./game/sortOpen";
-import { closeTile } from "./game/closeTile";
-import { add } from "./users/add";
-import { pay } from "./users/pay";
+import updateUser from "./users/updateUser";
+import startGame from "./game/startGame";
+import drawTile from "./game/drawTile";
+import sortHand from "./game/sortHand";
+import discardTile from "./game/discardTile";
+import openTile from "./game/openTile";
+import sortOpen from "./game/sortOpen";
+import closeTile from "./game/closeTile";
+import add from "./users/add";
+import pay from "./users/pay";
 
-const events: { [key: string]: SHandler } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile, add, pay };
+const events: { [key: string]: Function } = { updateUser, startGame, drawTile, sortHand, discardTile, openTile, sortOpen, closeTile, add, pay };
 
-export default class MahjongRoom implements Party.Server {
+export class MahjongRoom extends Server {
 	game: Game | false = false;
-	users: { [key: string]: User} = {};
-	
-	constructor(readonly room: Party.Room) { }
-	
-	onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-		console.log(`Connected:
-			id: ${conn.id}
-			room: ${this.room.id}
-			url: ${new URL(ctx.request.url).pathname}`);
+	users: { [key: string]: User } = {};
 
+	onConnect(conn: Connection, ctx: ConnectionContext) {
 		this.users[conn.id] = {
 			id: conn.id,
 			username: "anonymous",
 			points: 0,
 			playing: false
 		};
-		
+
 		conn.send(JSON.stringify({ event: "uuid", payload: conn.id }));
 		this.sendGame(conn);
 		this.sendUsers();
 	}
 
-	onClose(conn: Party.Connection) {
+	onClose(conn: Connection) {
 		delete this.users[conn.id];
 		this.sendUsers();
 		if (!Object.keys(this.users).length) this.game = false;
 	}
 
-	onMessage(message: string, sender: Party.Connection) {
-		let { event, payload }: Message = JSON.parse(message);
-		events[event]?.(this, sender, payload);
+	onMessage(conn: Connection, message: WSMessage) {
+		let str = typeof message == "string" ? message : new TextDecoder().decode(message);
+		let { event, payload }: Message = JSON.parse(str);
+		events[event]?.(this, conn, payload);
 	}
 
 	sendUsers() {
-		this.room.broadcast(JSON.stringify({ event: "users", payload: this.users }));
+		this.broadcast(JSON.stringify({ event: "users", payload: this.users }));
 	}
 
-	sendGame(conn?: Party.Connection) {
+	sendGame(conn?: Connection) {
 		if (conn) return conn.send(JSON.stringify({ event: "game", payload: this.game && this.game.export(conn.id) }));
-		for (let conn of this.room.getConnections()) conn.send(JSON.stringify({ event: "game", payload: this.game && this.game.export(conn.id) }));
+		for (let c of this.getConnections()) c.send(JSON.stringify({ event: "game", payload: this.game && this.game.export(c.id) }));
 	}
 }
 
-MahjongRoom satisfies Party.Worker;
+export default {
+	async fetch(request: Request, env: any) {
+		return (
+			(await routePartykitRequest(request, env)) ||
+			env.ASSETS.fetch(request)
+		);
+	}
+};

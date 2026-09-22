@@ -1,7 +1,7 @@
-import type MahjongRoom from "..";
-import type * as Party from "partykit/server";
+import type { MahjongRoom } from "..";
+import type { Connection } from "partyserver";
 
-export const updateUser: SHandler = (room: MahjongRoom, sender: Party.Connection, payload) => {
+export default function updateUser (room: MahjongRoom, sender: Connection, payload: any) {
 	room.users[sender.id] = {
 		...room.users[sender.id],
 		...payload

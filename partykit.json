@@ -1,10 +1,11 @@
 {
-  "$schema": "https://www.partykit.io/schema.json",
-  "name": "mahjong-party",
-  "main": "party/index.ts",
-  "compatibilityDate": "2026-09-18",
-  "serve": {
-    "path": "dist",
-    "singlePageApp": true
-  }
+    "$schema": "https://www.partykit.io/schema.json",
+    "name": "mahjong-party",
+    "main": "party/index.ts",
+    "domain": "mahjong.madum.cc",
+    "compatibilityDate": "2026-09-18",
+    "serve": {
+        "path": "dist",
+        "singlePageApp": true
+    }
 }

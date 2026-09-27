@@ -7,6 +7,9 @@
     import Game, { type SGame } from "../../../../shared/game";
     import type Tile from "../../../../shared/tiles";
 
+    import Hand from "./hand.svelte";
+    import TileElement from "./tile.svelte";
+
     const tileBack = "\u{1F02B}";
     
 	let socket: PartySocket;
@@ -14,29 +17,12 @@
 	let uuid = $state("");
 	let users: { [key: string]: User } = $state({});
 	let game: Game | false = $state(false);
+
 	let hand: Tile[] = $state([]);
 	let open: Tile[] = $state([]);
 
 	let sortedPlayers = $derived(Object.values(users).sort((a, b) => +b.playing - +a.playing));
 	let startable = $derived(!Object.values(users).filter(user => user.playing).length);
-
-	let draggedIndex: number | undefined;
-	
-	function dropHand(targetIndex: number){
-		if(draggedIndex === undefined || !hand) return;
-		const [draggedTile] = hand.splice(draggedIndex, 1);
-		hand.splice(targetIndex, 0, draggedTile);
-		draggedIndex = undefined;
-		send("sortHand", { tiles: hand.map(tile => tile.id) });
-	}
-
-	function dropOpen(targetIndex: number){
-		if(draggedIndex === undefined || !open) return;
-		const [draggedTile] = open.splice(draggedIndex, 1);
-		open.splice(targetIndex, 0, draggedTile);
-		draggedIndex = undefined;
-		send("sortOpen", { tiles: open.map(tile => tile.id) });
-	}
 
 	let events: { [key: string]: Function } = {
 		uuid(id: string){ uuid = id; },
@@ -79,18 +65,12 @@
 	<span>{game.deck.size()} tiles</span>
 	<h4>Current tile <button disabled={!game.current} onclick={() => send("drawTile", true)}>draw</button></h4>
 	{#if game.current}
-		<span style="font-size: 75px;">{game.current.render()}</span>
+		<TileElement tile={game.current} size={75} />
 	{:else}
 		<span>empty</span>
 	{/if}
 	<h4>Discard pile</h4>
-	<div>
-		{#each (game as Game).pile.tiles as tile (tile.id)}
-			<span style="font-size: 50px;">{tile.render()}</span>
-		{:else}
-			<span>empty</span>
-		{/each}
-	</div>
+	<Hand tiles={(game as Game).pile.tiles} />
 {:else}
 	<button onclick={() => send("startGame")} disabled={startable}>start game</button>
 {/if}
@@ -117,54 +97,22 @@
 			{#if game && user.playing}
 				<li>Open:
 					{#if user.id == uuid && open}
-						{#if open.length}
-							<div>
-							{#each open as tile, i (tile.id)}
-								<span
-									draggable="true"
-									ondragstart={_ => draggedIndex = i}
-									ondragover={e => e.preventDefault()}
-									ondrop={_ => dropOpen(i)}
-									onclick={() => send("closeTile", tile.id)}
-									onkeydown={() => {}}
-									role="button"
-									tabindex="0"
-									style="font-size: 75px;">{tile.render()}</span>								
-							{/each}
-						</div>
-						{:else}
-							<span>empty</span>
-						{/if}
+						<Hand interactive tiles={open} size={75} {socket}
+							sortEvent="sortOpen"
+							onClick={tile => _ => send("closeTile", tile.id)} />
 					{:else}
-						{#each game.players[user.id].open.tiles as tile (tile.id)}
-							<span style="font-size: 50px;">{tile.render()}</span>
-						{:else}
-							<span>empty</span>
-						{/each}
+						<Hand tiles={game.players[user.id].open.tiles} />
 					{/if}
 				</li>
 				<li>Hand:
 					{#if user.id == uuid && hand}
-						<div>
-							{#each hand as tile, i (tile.id)}
-								<span
-									draggable="true"
-									ondragstart={_ => draggedIndex = i}
-									ondragover={e => e.preventDefault()}
-									ondrop={_ => dropHand(i)}
-									onclick={() => send("openTile", tile.id)}
-									oncontextmenu={e => {
-										e.preventDefault();
-										send("discardTile", tile.id);
-									}}
-									onkeydown={() => {}}
-									role="button"
-									tabindex="0"
-									style="font-size: 75px;">{tile.render()}</span>
-							{:else}
-								<span>empty??</span>
-							{/each}
-						</div>
+						<Hand interactive tiles={hand} size={75} {socket}
+							sortEvent="sortHand"
+							onClick={tile => _ => send("openTile", tile.id)}
+							onContext={tile => e => {
+								e.preventDefault();
+								send("discardTile", tile.id);
+							}} />
 					{:else}
 						<span style="font-size: 50px;">{tileBack.repeat(game.players[user.id].hand.size())}</span>
 					{/if}

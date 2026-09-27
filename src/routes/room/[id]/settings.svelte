@@ -1,11 +1,11 @@
 <script lang="ts">
 	let { value = $bindable() }: { value: Settings } = $props();
 </script>
-<h2>Settings</h2>
-<h3>Audio</h3>
-<label><input type="checkbox" value="value" bind:checked={value.audio.english}> English prononciation</label>
-<label><input type="checkbox" value="value" bind:checked={value.audio.discarded}> Announce discarded card</label>
-<label><input type="checkbox" value="value" bind:checked={value.audio.local}> Generate audio locally</label>
-<h3>Spectators</h3>
-<label><input type="checkbox" value="value" bind:checked={value.spectators.hide}> Hide spectators</label>
-<label><input type="checkbox" value="value" bind:checked={value.spectators.last}> Display spectators last</label>
+<h2>settings</h2>
+<h3>audio</h3>
+<label><input type="checkbox" value="value" bind:checked={value.audio.english}> english prononciation (chinese default)</label>
+<label><input type="checkbox" value="value" bind:checked={value.audio.discarded}> announce discarded card</label>
+<label><input type="checkbox" value="value" bind:checked={value.audio.local}> generate audio locally</label>
+<h3>spectators</h3>
+<label><input type="checkbox" value="value" bind:checked={value.spectators.hide}> hide spectators</label>
+<label><input type="checkbox" value="value" bind:checked={value.spectators.last}> display spectators last</label>

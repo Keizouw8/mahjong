@@ -6,6 +6,25 @@ export enum Suit {
 	Flower = "flower"
 };
 
+export const pronounciations: { suits: { [key in Suit]: string }, honor: [string, string][] } = {
+	suits: {
+		dot: "筒",
+		bamboo: "条",
+		character: "万",
+		honor: "字牌",
+		flower: "花牌"
+	},
+	honor: [
+		["东风", "east wind"],
+		["南风", "south wind"],
+		["西风", "west wind"],
+		["北风", "north wind"],
+		["紅中", "red dragon"],
+		["發財", "green dragon"],
+		["白板", "white dragon"]
+	]
+};
+
 export const characters: { [key in Suit]: string[] } = {
 	character: ["\u{1F007}", "\u{1F008}", "\u{1F009}", "\u{1F00A}", "\u{1F00B}", "\u{1F00C}", "\u{1F00D}", "\u{1F00E}", "\u{1F00F}"],
 	bamboo: ["\u{1F010}", "\u{1F011}", "\u{1F012}", "\u{1F013}", "\u{1F014}", "\u{1F015}", "\u{1F016}", "\u{1F017}", "\u{1F018}"],
@@ -39,6 +58,12 @@ export default class Tile {
 		let [suit, value, copy] = id.split("-");
 		if (!Object.values(Suit).includes(suit as Suit)) throw new Error("Provided invalid suit");
 		return new Tile(suit as Suit, +value, +copy);
+	}
+
+	pronounce(english: boolean = false): string {
+		if (this.suit == Suit.Flower) return english ? "flower" : pronounciations.suits[Suit.Flower];
+		if (this.suit != Suit.Honor) return `${this.value + 1}${ english ? " " : "" }${english ? this.suit : pronounciations.suits[this.suit]}`;
+		return pronounciations.honor[this.value][+english];
 	}
 
 	render(): string {

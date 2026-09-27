@@ -7,6 +7,7 @@
     import Game, { type SGame } from "../../../../shared/game";
     import type Tile from "../../../../shared/tiles";
 
+    import SettingsElement from "./settings.svelte";
     import Hand from "./hand.svelte";
     import TileElement from "./tile.svelte";
 
@@ -18,11 +19,26 @@
 	let users: { [key: string]: User } = $state({});
 	let game: Game | false = $state(false);
 
+	let settingsPage = $state(false);
+	let settings: Settings = $state({
+		audio: {
+			english: false,
+			discarded: true,
+		},
+		spectators: {
+			hide: false,
+			last: true
+		}
+	});
+	
+	let previous: Tile | undefined = undefined;
 	let current: Tile | undefined = $derived(game ? (game as Game).current : undefined);
 	let hand: Tile[] = $state([]);
 	let open: Tile[] = $state([]);
 
-	let sortedPlayers = $derived(Object.values(users).sort((a, b) => +b.playing - +a.playing));
+	let players = $derived(Object.values(users)
+		.sort((a, b) =>settings.spectators.last ? +b.playing - +a.playing : 0)
+		.filter(user => settings.spectators.hide ? user.playing || user.id == uuid : true));
 	let startable = $derived(!Object.values(users).filter(user => user.playing).length);
 
 	let events: { [key: string]: Function } = {
@@ -59,12 +75,20 @@
 	$effect(function(){
 		window.speechSynthesis.cancel();	
 		if(!current) return;
-	    const utterance = new SpeechSynthesisUtterance(`${current.value + 1} ${current.suit}`);
-	    window.speechSynthesis.speak(utterance);
+		if(current.id != previous?.id && settings.audio.discarded){
+			let utterance = new SpeechSynthesisUtterance(current.pronounce(settings.audio.english));
+			utterance.lang = settings.audio.english ? "en-US" : "zh-CN";
+		    window.speechSynthesis.speak(utterance);
+		}
+		previous = current;
 	});
 </script>
 
 <a href="/">home</a>
+<button onclick={() => settingsPage = !settingsPage}>{ settingsPage ? "close" : "open" } settings</button>
+{#if settingsPage}
+	<SettingsElement bind:value={settings} />
+{/if}
 <h1>room: {roomid}</h1>
 <h2>game</h2>
 {#if game}
@@ -84,7 +108,7 @@
 {/if}
 
 <h2>users</h2>
-{#each sortedPlayers as user (user.id)}
+{#each players as user (user.id)}
 	<div style="color: {user.playing ? "unset" : "gray"}">
 		{#if user.id == uuid}
 			<b>

@@ -59,7 +59,7 @@
 	$effect(function(){
 		window.speechSynthesis.cancel();	
 		if(!current) return;
-	    const utterance = new SpeechSynthesisUtterance(`${current.value} ${current.suit}`);
+	    const utterance = new SpeechSynthesisUtterance(`${current.value + 1} ${current.suit}`);
 	    window.speechSynthesis.speak(utterance);
 	});
 </script>

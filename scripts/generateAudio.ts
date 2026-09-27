@@ -18,12 +18,8 @@ for (let [lang, tts] of languages) {
 	for (let [i, honor] of Object.entries(pronounciations.honor)) tts.ttsPromise(`${honor[+english]}`, path([lang, "honors", `${i}.mp3`])).catch(console.error);
 }
 
-
-
-
-
 function path(terms: string[]) {
-	return join(join(import.meta.dir, "../static/lang"), pathHelper(terms));
+	return join(join(import.meta.dir, "../static/audio"), pathHelper(terms));
 }
 
 function pathHelper(terms: string[]): string {

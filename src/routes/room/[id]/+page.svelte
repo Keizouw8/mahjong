@@ -7,6 +7,8 @@
     import Game, { type SGame } from "../../../../shared/game";
     import type Tile from "../../../../shared/tiles";
 
+    import { fetchTTS, localTTS } from "$lib";
+
     import SettingsElement from "./settings.svelte";
     import Hand from "./hand.svelte";
     import TileElement from "./tile.svelte";
@@ -24,6 +26,7 @@
 		audio: {
 			english: false,
 			discarded: true,
+			local: true
 		},
 		spectators: {
 			hide: false,
@@ -76,9 +79,8 @@
 		window.speechSynthesis.cancel();	
 		if(!current) return;
 		if(current.id != previous?.id && settings.audio.discarded){
-			let utterance = new SpeechSynthesisUtterance(current.pronounce(settings.audio.english));
-			utterance.lang = settings.audio.english ? "en-US" : "zh-CN";
-		    window.speechSynthesis.speak(utterance);
+			if (settings.audio.local) localTTS(current, settings.audio.english);
+			else fetchTTS(current, settings.audio.english);
 		}
 		previous = current;
 	});

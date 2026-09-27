@@ -114,7 +114,14 @@
 	<div style="color: {user.playing ? "unset" : "gray"}">
 		{#if user.id == uuid}
 			<b>
-				<span onblur={_ => send("updateUser", { username: user.username.replaceAll(/\s/g, "") })} bind:innerText={user.username} contenteditable></span>
+				<span role="textbox" tabindex="0" bind:innerText={user.username} contenteditable
+					onblur={_ => send("updateUser", { username: user.username.replaceAll(/\s/g, "") })}
+					onkeydown={function (e) {
+						if (e.key == "Enter" || e.key == "Escape") {
+							e.preventDefault();
+							e.currentTarget.blur();
+						}
+					}}></span>
 				(you)
 			</b>
 		{:else}

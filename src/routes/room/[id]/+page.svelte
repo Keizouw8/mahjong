@@ -18,6 +18,7 @@
 	let users: { [key: string]: User } = $state({});
 	let game: Game | false = $state(false);
 
+	let current: Tile | undefined = $derived(game ? (game as Game).current : undefined);
 	let hand: Tile[] = $state([]);
 	let open: Tile[] = $state([]);
 
@@ -54,6 +55,13 @@
 	function send(event: string, payload?: any){
 		socket.send(JSON.stringify({ event, payload }));
 	}
+
+	$effect(function(){
+		window.speechSynthesis.cancel();	
+		if(!current) return;
+	    const utterance = new SpeechSynthesisUtterance(`${current.value} ${current.suit}`);
+	    window.speechSynthesis.speak(utterance);
+	});
 </script>
 
 <a href="/">home</a>
@@ -64,8 +72,8 @@
 	<h4>Deck <button onclick={() => send("drawTile")}>draw</button></h4>
 	<span>{game.deck.size()} tiles</span>
 	<h4>Current tile <button disabled={!game.current} onclick={() => send("drawTile", true)}>draw</button></h4>
-	{#if game.current}
-		<TileElement tile={game.current} size={75} />
+	{#if current}
+		<TileElement tile={current} size={75} />
 	{:else}
 		<span>empty</span>
 	{/if}

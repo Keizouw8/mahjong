@@ -60,12 +60,6 @@ export default class Tile {
 		return new Tile(suit as Suit, +value, +copy);
 	}
 
-	pronounce(english: boolean = false): string {
-		if (this.suit == Suit.Flower) return english ? "flower" : pronounciations.suits[Suit.Flower];
-		if (this.suit != Suit.Honor) return `${this.value + 1}${ english ? " " : "" }${english ? this.suit : pronounciations.suits[this.suit]}`;
-		return pronounciations.honor[this.value][+english];
-	}
-
 	render(): string {
 		if (this.value > suits[this.suit]) throw new Error("Invalid value within suit");
 		return characters[this.suit][this.value];

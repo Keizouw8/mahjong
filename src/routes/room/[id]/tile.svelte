@@ -4,6 +4,7 @@
 
 	interface Props{
 		tile: Tile;
+		interactive?: boolean;
 		size?: number;
 		onDrag?: DragEventHandler<HTMLSpanElement>;
 		onDrop?: DragEventHandler<HTMLSpanElement>;
@@ -16,9 +17,13 @@
 	let fontSize = $derived(size || 50);
 	$inspect(fontSize);
 </script>
+
 {#if interactive}
 	<span draggable="true"
-		ondragstart={onDrag}
+		ondragstart={e => {
+			e.dataTransfer?.setData("text/plain", tile.id);
+			onDrag?.(e);
+		}}
 		ondragover={e => e.preventDefault()}
 		ondrop={onDrop}
 		onclick={onClick}
@@ -26,8 +31,19 @@
 		onkeydown={() => {}}
 		role="button"
 		tabindex="0"
-		style="font-size: {fontSize}px;">{tile.render()}
+		style="font-size: {fontSize}px;"
+		data-tile={tile.id} >{tile.render()}
 	</span>
 {:else}
 	<span style="font-size: {fontSize}px;">{tile.render()}</span>
 {/if}
+
+<style>
+	span[draggable="true"] {
+		touch-action: none;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		user-select: none;
+		display: inline-block;
+	}
+</style>

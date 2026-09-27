@@ -25,6 +25,10 @@
 		"wrangler": "^4.136.1"
 	},
 	"dependencies": {
-		"partysocket": "1.3.0"
+		"partysocket": "1.3.0",
+		"svelte-drag-drop-touch": "^0.1.9"
+	},
+	"patchedDependencies": {
+		"svelte-drag-drop-touch@0.1.9": "patches/svelte-drag-drop-touch@0.1.9.patch"
 	}
 }

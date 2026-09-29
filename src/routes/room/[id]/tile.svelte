@@ -15,7 +15,6 @@
 
 	let { tile, interactive, onDrop, onDrag, onClick, onContext, size }: Props = $props();
 	let fontSize = $derived(size || 50);
-	$inspect(fontSize);
 </script>
 
 {#if interactive}

@@ -57,7 +57,19 @@
 		},
 		previousPlayerDiscarded(){
 			if (!settings.audio.dingTurn) return;
-			// audio
+			let audio = new AudioContext();
+			
+			let gain = audio.createGain();
+			gain.gain.value = 0.33;
+			gain.connect(audio.destination);
+			
+			let oscillator = audio.createOscillator();
+			oscillator.type = "sine";
+			oscillator.frequency.value = 600;
+			oscillator.connect(gain);
+			oscillator.start();
+			
+			setTimeout(() => oscillator.stop(), 400);
 		}
 	};
 

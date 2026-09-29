@@ -1,20 +1,20 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { page } from "$app/state";
-    import { goto } from "$app/navigation";
-    
+	import { onMount } from "svelte";
+	import { page } from "$app/state";
+	import { goto } from "$app/navigation";
+	
 	import PartySocket from "partysocket";
-    import Game, { type SGame } from "../../../../shared/game";
-    import type Tile from "../../../../shared/tiles";
+	import Game, { type SGame } from "../../../../shared/game";
+	import type Tile from "../../../../shared/tiles";
 
-    import { fetchTTS, localTTS } from "$lib";
+	import { fetchTTS, localTTS } from "$lib";
 
-    import SettingsElement from "./settings.svelte";
-    import Hand from "./hand.svelte";
-    import TileElement from "./tile.svelte";
+	import SettingsElement from "./settings.svelte";
+	import Hand from "./hand.svelte";
+	import TileElement from "./tile.svelte";
 
-    const tileBack = "\u{1F02B}";
-    
+	const tileBack = "\u{1F02B}";
+	
 	let socket: PartySocket;
 	let roomid = $derived(page.params.id);
 	let uuid = $state("");
@@ -26,7 +26,8 @@
 		audio: {
 			english: false,
 			discarded: true,
-			local: true
+			local: true,
+			dingTurn: false
 		},
 		spectators: {
 			hide: false,
@@ -53,6 +54,10 @@
 				hand = game.players[uuid].hand.tiles;
 				open = game.players[uuid].open.tiles;
 			}
+		},
+		previousPlayerDiscarded(){
+			if (!settings.audio.dingTurn) return;
+			// audio
 		}
 	};
 
@@ -129,11 +134,11 @@
 		{/if}
 		<ul>
 			<li>Points: {user.points}
-    			{#if user.id == uuid}
-    				<button onclick={_ => send("add", parseFloat(prompt("How many points?") || "0") || 0)}>add</button>
-    			{:else}
-    			    <button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How many points?") || "0") || 0 })}>pay</button>
-    			{/if}
+				{#if user.id == uuid}
+					<button onclick={_ => send("add", parseFloat(prompt("How many points?") || "0") || 0)}>add</button>
+				{:else}
+					<button onclick={_ => send("pay", { recipient: user.id, amount: parseFloat(prompt("How many points?") || "0") || 0 })}>pay</button>
+				{/if}
 			</li>
 			{#if game && user.playing}
 				<li>Open:

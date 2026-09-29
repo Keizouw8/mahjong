@@ -1,13 +1,12 @@
 import type { MahjongRoom } from "..";
 import type { Connection } from "partyserver";
+import getGame from "./getGame";
 
 export default function drawTile (room: MahjongRoom, sender: Connection, fromCurrent: boolean = false) {
-	if (!room.game) return;
-	let player = room.game.players[sender.id];
-	if (!player) return;
+	let { player, game } = getGame(room, sender);
 	if (fromCurrent) {
-		if (room.game.current) player.hand.add(room.game.current);
-		room.game.current = undefined;
-	} else player.hand.add(room.game.draw());
+		if (game.current) player.hand.add(game.current);
+		game.current = undefined;
+	} else player.hand.add(game.draw());
 	room.sendGame();
 }

@@ -48,7 +48,14 @@ export class MahjongRoom extends Server {
 		this.broadcast(JSON.stringify({ event: "users", payload: this.users }));
 	}
 
-	sendGame(conn?: Connection) {
+	send(event: string, payload: any, conn?: Connection | string) {
+		let message = JSON.stringify({ event, payload });
+		if (!conn) return this.broadcast(message);
+		if (typeof conn != "string") return conn.send(message);
+		this.getConnection(conn)?.send(message);
+	}
+
+	sendGame(conn?: Connection) {		
 		if (conn) return conn.send(JSON.stringify({ event: "game", payload: this.game && this.game.export(conn.id) }));
 		for (let c of this.getConnections()) c.send(JSON.stringify({ event: "game", payload: this.game && this.game.export(c.id) }));
 	}
